@@ -1,44 +1,69 @@
-# Terraform working directories
+# Terraform provider and module cache
 **/.terraform/*
 
-# Terraform state files
+# Terraform state contains resource attributes and may contain sensitive data
 *.tfstate
 *.tfstate.*
 
-# Terraform plan files
+# Terraform plan files may contain sensitive values
 *.tfplan
 *.plan
 
-# Terraform variable files that may contain secrets
+# Environment-specific input values
 *.tfvars
 *.tfvars.json
 !*.tfvars.example
-
-# Terraform CLI configuration
-.terraformrc
-terraform.rc
-
-# Terraform crash and override files
-crash.log
-crash.*.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
 
 # Local backend configuration
 backend.hcl
 !backend.hcl.example
 
-# Environment and credential files
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Local Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+# Kubernetes authentication and client configuration
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+
+# Local environment and secret files
 .env
 .env.*
 !.env.example
 *.pem
 *.key
+*.p12
+
+# Unencrypted local secret-value files
+*.secret.yaml
+*.secrets.yaml
+values.secret.yaml
+values.secrets.yaml
+
+# Local security and cost reports
+checkov-report.*
+trivy-report.*
+infracost-report.*
 
 # Editor and operating-system files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Temporary and backup files
+*.tmp
+*.swp
+*.swo
+*~

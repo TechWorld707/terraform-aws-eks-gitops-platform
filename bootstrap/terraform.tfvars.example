@@ -1,0 +1,8 @@
+aws_region               = "us-east-1"
+project_name             = "eks-gitops-platform"
+kms_deletion_window_days = 30
+
+tags = {
+  Environment = "shared"
+  Owner       = "platform-engineering"
+}
