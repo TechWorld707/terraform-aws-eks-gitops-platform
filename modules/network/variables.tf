@@ -79,12 +79,6 @@ variable "single_nat_gateway" {
   default     = false
 }
 
-variable "enable_vpc_endpoints" {
-  description = "Create selected VPC endpoints to reduce private-subnet traffic through NAT gateways."
-  type        = bool
-  default     = true
-}
-
 variable "enable_s3_gateway_endpoint" {
   description = "Create the free S3 gateway endpoint and associate it with private route tables."
   type        = bool
