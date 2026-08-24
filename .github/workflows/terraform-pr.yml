@@ -1,0 +1,149 @@
+name: Terraform pull-request validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  repository-security:
+    name: Repository security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Reject prohibited tracked files
+        shell: bash
+        run: |
+          prohibited_files="$(
+            git ls-files |
+            grep --extended-regexp \
+              '(^|/)\.terraform(/|$)|(^|/)(terraform\.tfstate|terraform\.tfstate\.backup)(\.|$)|\.tfplan$|(^|/)backend\.hcl$|(^|/).*\.auto\.tfvars$|(^|/)\.env($|\.)|(^|/)kubeconfig($|\.)|\.pem$|\.key$' ||
+            true
+          )"
+
+          if [ -n "$prohibited_files" ]; then
+            echo "ERROR: Prohibited generated or sensitive files are tracked."
+            printf '%s\n' "$prohibited_files"
+            exit 1
+          fi
+
+          echo "No prohibited generated or sensitive files are tracked."
+
+      - name: Scan tracked content for credential patterns
+        shell: bash
+        run: |
+          aws_key_marker="AK""IA"
+          aws_secret_marker="aws_secret""_access_key"
+          long_token_marker="github""_pat_"
+          short_token_marker="gh""p_"
+          private_key_marker="BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY"
+
+          credential_pattern="${aws_key_marker}[0-9A-Z]{16}|${aws_secret_marker}[[:space:]]*=|${long_token_marker}[A-Za-z0-9_]+|${short_token_marker}[A-Za-z0-9]+|${private_key_marker}"
+
+          if git grep \
+            --line-number \
+            --extended-regexp \
+            "$credential_pattern"
+          then
+            echo "ERROR: Review the possible credential shown above."
+            exit 1
+          fi
+
+          echo "No common credential patterns were found."
+
+  terraform-format:
+    name: Terraform formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.3"
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+
+  terraform-validation:
+    name: Validate and test ${{ matrix.configuration }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration:
+          - bootstrap
+          - modules/network
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.3"
+          terraform_wrapper: false
+
+      - name: Initialize Terraform without remote backend
+        run: |
+          terraform \
+            -chdir="${{ matrix.configuration }}" \
+            init \
+            -backend=false \
+            -input=false
+
+      - name: Validate Terraform configuration
+        run: |
+          terraform \
+            -chdir="${{ matrix.configuration }}" \
+            validate
+
+      - name: Run Terraform tests
+        run: |
+          terraform \
+            -chdir="${{ matrix.configuration }}" \
+            test
+
+  checkov:
+    name: Checkov ${{ matrix.configuration }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration:
+          - bootstrap
+          - modules/network
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run Checkov security scan
+        env:
+          CHECKOV_DIRECTORY: ${{ matrix.configuration }}
+        run: |
+          docker run \
+            --rm \
+            --volume "$PWD:/tf:ro" \
+            ghcr.io/bridgecrewio/checkov:3.3.11 \
+            --directory "/tf/${CHECKOV_DIRECTORY}" \
+            --framework terraform \
+            --quiet \
+            --download-external-modules false \
+            --output cli
