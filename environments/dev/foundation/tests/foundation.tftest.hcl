@@ -27,7 +27,7 @@ mock_provider "aws" {
   }
 }
 
-run "development_foundation_network" {
+run "development_foundation" {
   command = plan
 
   assert {
@@ -48,6 +48,54 @@ run "development_foundation_network" {
   assert {
     condition     = module.network.vpc_cidr_block == "10.20.0.0/16"
     error_message = "The development VPC must use CIDR 10.20.0.0/16."
+  }
+
+  assert {
+    condition     = var.ecr_repository_names == toset(["backend", "frontend"])
+    error_message = "Development must configure backend and frontend ECR repositories."
+  }
+
+  assert {
+    condition     = var.ecr_image_tag_mutability == "IMMUTABLE"
+    error_message = "Development ECR repositories must use immutable image tags."
+  }
+
+  assert {
+    condition     = var.ecr_scan_on_push
+    error_message = "Development ECR repositories must scan images when pushed."
+  }
+
+  assert {
+    condition     = !var.ecr_force_delete
+    error_message = "Development ECR repositories must not allow force deletion."
+  }
+
+  assert {
+    condition     = var.ecr_untagged_image_retention_days == 7
+    error_message = "Development must retain untagged ECR images for seven days."
+  }
+
+  assert {
+    condition     = var.ecr_maximum_image_count == 30
+    error_message = "Development must retain no more than 30 images per ECR repository."
+  }
+
+  assert {
+    condition     = var.ecr_kms_deletion_window_days == 30
+    error_message = "The ECR KMS key must use a 30-day deletion window."
+  }
+
+  assert {
+    condition     = length(module.ecr.repository_names) == 2
+    error_message = "The ECR module must create two application repositories."
+  }
+
+  assert {
+    condition = (
+      contains(keys(module.ecr.repository_names), "backend") &&
+      contains(keys(module.ecr.repository_names), "frontend")
+    )
+    error_message = "The ECR module must expose backend and frontend repositories."
   }
 
   assert {

@@ -27,6 +27,18 @@ enable_s3_gateway_endpoint = true
 enable_interface_endpoints = false
 flow_log_retention_days    = 365
 
+ecr_repository_names = [
+  "backend",
+  "frontend"
+]
+
+ecr_image_tag_mutability           = "IMMUTABLE"
+ecr_scan_on_push                   = true
+ecr_force_delete                   = false
+ecr_untagged_image_retention_days  = 7
+ecr_maximum_image_count            = 30
+ecr_kms_deletion_window_days       = 30
+
 tags = {
   Owner = "platform-engineering"
 }

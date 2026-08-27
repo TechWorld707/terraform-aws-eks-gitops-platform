@@ -17,3 +17,20 @@ module "network" {
 
   tags = var.tags
 }
+
+module "ecr" {
+  source = "../../../modules/ecr"
+
+  name        = var.project_name
+  environment = var.environment
+
+  repository_names              = var.ecr_repository_names
+  image_tag_mutability          = var.ecr_image_tag_mutability
+  scan_on_push                  = var.ecr_scan_on_push
+  force_delete                  = var.ecr_force_delete
+  untagged_image_retention_days = var.ecr_untagged_image_retention_days
+  maximum_image_count           = var.ecr_maximum_image_count
+  kms_deletion_window_days      = var.ecr_kms_deletion_window_days
+
+  tags = var.tags
+}
