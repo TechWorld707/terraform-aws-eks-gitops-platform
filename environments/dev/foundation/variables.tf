@@ -128,3 +128,50 @@ variable "tags" {
     Owner = "platform-engineering"
   }
 }
+
+variable "ecr_repository_names" {
+  description = "Application components requiring ECR repositories."
+  type        = set(string)
+  default     = ["backend", "frontend"]
+}
+
+variable "ecr_image_tag_mutability" {
+  description = "Image-tag mutability setting for development ECR repositories."
+  type        = string
+  default     = "IMMUTABLE"
+
+  validation {
+    condition     = contains(["IMMUTABLE", "MUTABLE"], var.ecr_image_tag_mutability)
+    error_message = "ecr_image_tag_mutability must be IMMUTABLE or MUTABLE."
+  }
+}
+
+variable "ecr_scan_on_push" {
+  description = "Scan container images for vulnerabilities when pushed."
+  type        = bool
+  default     = true
+}
+
+variable "ecr_force_delete" {
+  description = "Allow development ECR repositories to be deleted when they contain images."
+  type        = bool
+  default     = false
+}
+
+variable "ecr_untagged_image_retention_days" {
+  description = "Number of days to retain untagged development images."
+  type        = number
+  default     = 7
+}
+
+variable "ecr_maximum_image_count" {
+  description = "Maximum number of images retained in each development repository."
+  type        = number
+  default     = 30
+}
+
+variable "ecr_kms_deletion_window_days" {
+  description = "Waiting period before deletion of the ECR KMS key."
+  type        = number
+  default     = 30
+}

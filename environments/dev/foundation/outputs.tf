@@ -82,3 +82,28 @@ output "default_security_group_id" {
   description = "ID of the managed deny-all default VPC security group."
   value       = module.network.default_security_group_id
 }
+
+output "ecr_repository_names" {
+  description = "Map of application components to ECR repository names."
+  value       = module.ecr.repository_names
+}
+
+output "ecr_repository_arns" {
+  description = "Map of application components to ECR repository ARNs."
+  value       = module.ecr.repository_arns
+}
+
+output "ecr_repository_urls" {
+  description = "Map of application components to ECR repository URLs."
+  value       = module.ecr.repository_urls
+}
+
+output "ecr_registry_id" {
+  description = "AWS account registry ID containing the application repositories."
+  value       = module.ecr.registry_id
+}
+
+output "ecr_kms_key_arn" {
+  description = "ARN of the KMS key encrypting the ECR repositories."
+  value       = module.ecr.kms_key_arn
+}
