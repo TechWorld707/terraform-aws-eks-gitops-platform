@@ -175,3 +175,185 @@ variable "ecr_kms_deletion_window_days" {
   type        = number
   default     = 30
 }
+
+variable "eks_kubernetes_version" {
+  description = "Kubernetes version used by the development EKS cluster."
+  type        = string
+  default     = "1.36"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+$",
+        var.eks_kubernetes_version
+      )
+    )
+
+    error_message = "eks_kubernetes_version must use major.minor format."
+  }
+}
+
+variable "eks_endpoint_public_access" {
+  description = "Enable public access to the development Kubernetes API endpoint."
+  type        = bool
+  default     = false
+}
+
+variable "eks_public_access_cidrs" {
+  description = "CIDR blocks permitted to access the public Kubernetes API endpoint."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for cidr in var.eks_public_access_cidrs :
+      can(cidrhost(cidr, 0))
+    ])
+
+    error_message = "Every eks_public_access_cidrs entry must be a valid CIDR block."
+  }
+}
+
+variable "eks_bootstrap_cluster_creator_admin_permissions" {
+  description = "Temporarily grant the cluster creator Kubernetes administrator access."
+  type        = bool
+  default     = true
+}
+
+variable "eks_deletion_protection" {
+  description = "Protect the development EKS cluster from accidental deletion."
+  type        = bool
+  default     = false
+}
+
+variable "eks_kms_deletion_window_days" {
+  description = "Waiting period before deletion of the EKS secrets KMS key."
+  type        = number
+  default     = 30
+
+  validation {
+    condition = (
+      var.eks_kms_deletion_window_days >= 7 &&
+      var.eks_kms_deletion_window_days <= 30
+    )
+
+    error_message = "eks_kms_deletion_window_days must be between 7 and 30."
+  }
+}
+
+variable "node_group_name" {
+  description = "Logical name of the development managed node group."
+  type        = string
+  default     = "general"
+}
+
+variable "node_capacity_type" {
+  description = "EC2 capacity type used by development worker nodes."
+  type        = string
+  default     = "ON_DEMAND"
+
+  validation {
+    condition = contains(
+      ["ON_DEMAND", "SPOT"],
+      var.node_capacity_type
+    )
+
+    error_message = "node_capacity_type must be ON_DEMAND or SPOT."
+  }
+}
+
+variable "node_instance_types" {
+  description = "EC2 instance types used by development worker nodes."
+  type        = list(string)
+
+  default = [
+    "t3.medium"
+  ]
+
+  validation {
+    condition = (
+      length(var.node_instance_types) > 0 &&
+      length(distinct(var.node_instance_types)) ==
+      length(var.node_instance_types)
+    )
+
+    error_message = "node_instance_types must contain at least one unique instance type."
+  }
+}
+
+variable "node_disk_size" {
+  description = "Worker-node root volume size in GiB."
+  type        = number
+  default     = 50
+
+  validation {
+    condition = (
+      var.node_disk_size >= 20 &&
+      var.node_disk_size <= 500
+    )
+
+    error_message = "node_disk_size must be between 20 and 500 GiB."
+  }
+}
+
+variable "node_minimum_size" {
+  description = "Minimum number of development worker nodes."
+  type        = number
+  default     = 1
+}
+
+variable "node_desired_size" {
+  description = "Initial desired number of development worker nodes."
+  type        = number
+  default     = 2
+}
+
+variable "node_maximum_size" {
+  description = "Maximum number of development worker nodes."
+  type        = number
+  default     = 4
+}
+
+variable "node_maximum_unavailable" {
+  description = "Maximum unavailable worker nodes during an update."
+  type        = number
+  default     = 1
+
+  validation {
+    condition = (
+      var.node_maximum_unavailable >= 1 &&
+      var.node_maximum_unavailable <= 100
+    )
+
+    error_message = "node_maximum_unavailable must be between 1 and 100."
+  }
+}
+
+variable "node_enable_repair" {
+  description = "Enable automatic repair of unhealthy development worker nodes."
+  type        = bool
+  default     = true
+}
+
+check "valid_development_node_scaling" {
+  assert {
+    condition = (
+      var.node_minimum_size >= 0 &&
+      var.node_minimum_size <= var.node_desired_size &&
+      var.node_desired_size <= var.node_maximum_size
+    )
+
+    error_message = "Node scaling must satisfy 0 <= minimum <= desired <= maximum."
+  }
+}
+
+check "valid_development_public_endpoint" {
+  assert {
+    condition = (
+      !var.eks_endpoint_public_access ||
+      length(var.eks_public_access_cidrs) > 0
+    )
+
+    error_message = "Public EKS endpoint access requires at least one permitted CIDR."
+  }
+}
