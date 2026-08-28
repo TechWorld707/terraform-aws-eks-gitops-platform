@@ -107,3 +107,79 @@ output "ecr_kms_key_arn" {
   description = "ARN of the KMS key encrypting the ECR repositories."
   value       = module.ecr.kms_key_arn
 }
+
+output "eks_cluster_role_name" {
+  description = "Name of the development EKS cluster IAM role."
+  value       = module.iam.cluster_role_name
+}
+
+output "eks_cluster_role_arn" {
+  description = "ARN of the development EKS cluster IAM role."
+  value       = module.iam.cluster_role_arn
+}
+
+output "eks_node_role_name" {
+  description = "Name of the development EKS worker-node IAM role."
+  value       = module.iam.node_role_name
+}
+
+output "eks_node_role_arn" {
+  description = "ARN of the development EKS worker-node IAM role."
+  value       = module.iam.node_role_arn
+}
+
+output "eks_cluster_name" {
+  description = "Name of the development EKS cluster."
+  value       = module.eks_cluster.cluster_name
+}
+
+output "eks_cluster_arn" {
+  description = "ARN of the development EKS cluster."
+  value       = module.eks_cluster.cluster_arn
+}
+
+output "eks_cluster_endpoint" {
+  description = "Endpoint of the development Kubernetes API server."
+  value       = module.eks_cluster.cluster_endpoint
+}
+
+output "eks_cluster_certificate_authority_data" {
+  description = "Base64-encoded certificate authority data for the development cluster."
+  value       = module.eks_cluster.cluster_certificate_authority_data
+  sensitive   = true
+}
+
+output "eks_cluster_security_group_id" {
+  description = "Security group created by EKS for the development cluster."
+  value       = module.eks_cluster.cluster_security_group_id
+}
+
+output "eks_oidc_issuer_url" {
+  description = "OIDC issuer URL used for EKS workload identities."
+  value       = module.eks_cluster.oidc_issuer_url
+}
+
+output "eks_secrets_kms_key_arn" {
+  description = "ARN of the KMS key encrypting Kubernetes secrets."
+  value       = module.eks_cluster.kms_key_arn
+}
+
+output "eks_node_group_name" {
+  description = "Name of the development EKS managed node group."
+  value       = module.managed_node_group.node_group_name
+}
+
+output "eks_node_group_arn" {
+  description = "ARN of the development EKS managed node group."
+  value       = module.managed_node_group.node_group_arn
+}
+
+output "eks_node_group_status" {
+  description = "Status of the development EKS managed node group."
+  value       = module.managed_node_group.node_group_status
+}
+
+output "eks_node_autoscaling_group_names" {
+  description = "Auto Scaling groups backing the development managed node group."
+  value       = module.managed_node_group.autoscaling_group_names
+}

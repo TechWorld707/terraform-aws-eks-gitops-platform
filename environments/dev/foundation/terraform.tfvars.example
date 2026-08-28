@@ -39,6 +39,31 @@ ecr_untagged_image_retention_days  = 7
 ecr_maximum_image_count            = 30
 ecr_kms_deletion_window_days       = 30
 
+eks_kubernetes_version = "1.36"
+
+eks_endpoint_public_access = false
+eks_public_access_cidrs     = []
+
+# Temporary until dedicated EKS access entries are implemented.
+eks_bootstrap_cluster_creator_admin_permissions = true
+
+# Keep false in development so the environment can be destroyed.
+eks_deletion_protection      = false
+eks_kms_deletion_window_days = 30
+
+node_group_name    = "general"
+node_capacity_type = "ON_DEMAND"
+
+node_instance_types = [
+  "t3.medium"
+]
+
+node_disk_size           = 50
+node_minimum_size        = 1
+node_desired_size        = 2
+node_maximum_size        = 4
+node_maximum_unavailable = 1
+node_enable_repair       = true
 tags = {
   Owner = "platform-engineering"
 }
