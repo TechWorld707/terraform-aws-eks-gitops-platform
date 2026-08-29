@@ -97,3 +97,28 @@ output "external_secrets_chart_version" {
   description = "Deployed External Secrets Operator Helm chart version."
   value       = helm_release.external_secrets.version
 }
+
+output "cluster_autoscaler_role_name" {
+  description = "Name of the Cluster Autoscaler Pod Identity IAM role."
+  value       = module.addons.cluster_autoscaler_role_name
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "ARN of the Cluster Autoscaler Pod Identity IAM role."
+  value       = module.addons.cluster_autoscaler_role_arn
+}
+
+output "cluster_autoscaler_policy_arn" {
+  description = "ARN of the Cluster Autoscaler IAM policy."
+  value       = module.addons.cluster_autoscaler_policy_arn
+}
+
+output "cluster_autoscaler_association_id" {
+  description = "ID of the Cluster Autoscaler Pod Identity association."
+  value       = module.addons.cluster_autoscaler_association_id
+}
+
+output "cluster_autoscaler_chart_version" {
+  description = "Deployed Cluster Autoscaler Helm chart version."
+  value       = helm_release.cluster_autoscaler.version
+}

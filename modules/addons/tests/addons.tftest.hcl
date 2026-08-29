@@ -299,4 +299,39 @@ run "core_eks_addons" {
 
     error_message = "The External Secrets role must include its controller tag."
   }
+
+  assert {
+    condition = (
+      aws_iam_role.cluster_autoscaler.name ==
+      "three-tier-eks-dev-cluster-autoscaler"
+    )
+
+    error_message = "The Cluster Autoscaler Pod Identity role name is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.cluster_autoscaler.namespace ==
+      "kube-system"
+    )
+
+    error_message = "Cluster Autoscaler must run in kube-system."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.cluster_autoscaler.service_account ==
+      "cluster-autoscaler"
+    )
+
+    error_message = "The Cluster Autoscaler service account is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_iam_role.cluster_autoscaler.permissions_boundary == null
+    )
+
+    error_message = "Cluster Autoscaler must not use a permissions boundary by default."
+  }
 }

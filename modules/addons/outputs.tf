@@ -126,3 +126,23 @@ output "external_secrets_association_id" {
   description = "ID of the External Secrets EKS Pod Identity association."
   value       = aws_eks_pod_identity_association.external_secrets.association_id
 }
+
+output "cluster_autoscaler_role_name" {
+  description = "Name of the Cluster Autoscaler Pod Identity IAM role."
+  value       = aws_iam_role.cluster_autoscaler.name
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "ARN of the Cluster Autoscaler Pod Identity IAM role."
+  value       = aws_iam_role.cluster_autoscaler.arn
+}
+
+output "cluster_autoscaler_policy_arn" {
+  description = "ARN of the Cluster Autoscaler IAM policy."
+  value       = aws_iam_policy.cluster_autoscaler.arn
+}
+
+output "cluster_autoscaler_association_id" {
+  description = "ID of the Cluster Autoscaler Pod Identity association."
+  value       = aws_eks_pod_identity_association.cluster_autoscaler.association_id
+}

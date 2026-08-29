@@ -255,4 +255,58 @@ run "development_addons" {
 
     error_message = "External Secrets must use its dedicated service account."
   }
+
+  assert {
+    condition = (
+      helm_release.cluster_autoscaler.name ==
+      "cluster-autoscaler"
+    )
+
+    error_message = "The Cluster Autoscaler Helm release name is incorrect."
+  }
+
+  assert {
+    condition = (
+      helm_release.cluster_autoscaler.namespace ==
+      "kube-system"
+    )
+
+    error_message = "Cluster Autoscaler must run in kube-system."
+  }
+
+  assert {
+    condition = (
+      helm_release.cluster_autoscaler.version ==
+      var.cluster_autoscaler_chart_version
+    )
+
+    error_message = "The configured Cluster Autoscaler chart version must be used."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.cluster_autoscaler.values)).autoDiscovery.clusterName ==
+      "three-tier-eks-dev"
+    )
+
+    error_message = "Cluster Autoscaler must discover the development cluster."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.cluster_autoscaler.values)).image.tag ==
+      "v1.33.6"
+    )
+
+    error_message = "Cluster Autoscaler must use the Kubernetes 1.33-compatible image."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.cluster_autoscaler.values)).rbac.serviceAccount.name ==
+      "cluster-autoscaler"
+    )
+
+    error_message = "Cluster Autoscaler must use its dedicated service account."
+  }
 }
