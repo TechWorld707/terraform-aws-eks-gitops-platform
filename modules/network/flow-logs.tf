@@ -188,11 +188,6 @@ resource "aws_flow_log" "this" {
     ]
   )
 
-  destination_options {
-    file_format                = "plain-text"
-    hive_compatible_partitions = false
-    per_hour_partition         = false
-  }
 
   tags = merge(
     local.common_tags,
