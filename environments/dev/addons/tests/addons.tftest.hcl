@@ -309,4 +309,89 @@ run "development_addons" {
 
     error_message = "Cluster Autoscaler must use its dedicated service account."
   }
+
+  assert {
+    condition     = helm_release.argocd.name == "argocd"
+    error_message = "The Argo CD Helm release name is incorrect."
+  }
+
+  assert {
+    condition     = helm_release.argocd.namespace == "argocd"
+    error_message = "Argo CD must use its dedicated namespace."
+  }
+
+  assert {
+    condition     = helm_release.argocd.chart == "argo-cd"
+    error_message = "The official Argo CD chart must be installed."
+  }
+
+  assert {
+    condition = (
+      helm_release.argocd.version ==
+      var.argocd_chart_version
+    )
+
+    error_message = "The configured Argo CD chart version must be used."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.argocd.values)).crds.install
+    )
+
+    error_message = "Argo CD CRDs must be installed."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.argocd.values)).server.service.type ==
+      "ClusterIP"
+    )
+
+    error_message = "The Argo CD server must remain internal by default."
+  }
+
+  assert {
+    condition = (
+      !yamldecode(one(helm_release.argocd.values)).configs.params["server.insecure"]
+    )
+
+    error_message = "The Argo CD server must retain TLS."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.argocd.values)).server.replicas ==
+      var.argocd_server_replicas
+    )
+
+    error_message = "Argo CD must use the configured server replica count."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.argocd.values)).repoServer.replicas ==
+      var.argocd_repo_server_replicas
+    )
+
+    error_message = "Argo CD must use the configured repository server replica count."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.argocd.values)).applicationSet.replicas ==
+      var.argocd_application_set_replicas
+    )
+
+    error_message = "Argo CD must use the configured ApplicationSet replica count."
+  }
+
+  assert {
+    condition = (
+      !yamldecode(one(helm_release.argocd.values)).dex.enabled
+    )
+
+    error_message = "Dex must remain disabled until an identity provider is configured."
+  }
 }
+

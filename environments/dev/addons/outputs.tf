@@ -122,3 +122,18 @@ output "cluster_autoscaler_chart_version" {
   description = "Deployed Cluster Autoscaler Helm chart version."
   value       = helm_release.cluster_autoscaler.version
 }
+
+output "argocd_release_name" {
+  description = "Name of the Argo CD Helm release."
+  value       = helm_release.argocd.name
+}
+
+output "argocd_namespace" {
+  description = "Kubernetes namespace containing Argo CD."
+  value       = helm_release.argocd.namespace
+}
+
+output "argocd_chart_version" {
+  description = "Deployed Argo CD Helm chart version."
+  value       = helm_release.argocd.version
+}
