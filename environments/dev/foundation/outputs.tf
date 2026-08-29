@@ -183,3 +183,13 @@ output "eks_node_autoscaling_group_names" {
   description = "Auto Scaling groups backing the development managed node group."
   value       = module.managed_node_group.autoscaling_group_names
 }
+
+output "eks_access_entry_principal_arns" {
+  description = "Map of EKS access-entry keys to IAM principal ARNs."
+  value       = module.eks_cluster.access_entry_principal_arns
+}
+
+output "eks_access_policy_arns" {
+  description = "Map of EKS access-entry keys to associated access-policy ARNs."
+  value       = module.eks_cluster.access_policy_arns
+}

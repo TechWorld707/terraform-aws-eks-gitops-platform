@@ -213,11 +213,10 @@ variable "eks_public_access_cidrs" {
     error_message = "Every eks_public_access_cidrs entry must be a valid CIDR block."
   }
 }
-
 variable "eks_bootstrap_cluster_creator_admin_permissions" {
-  description = "Temporarily grant the cluster creator Kubernetes administrator access."
+  description = "Grant the cluster creator Kubernetes administrator access."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "eks_deletion_protection" {
@@ -326,6 +325,22 @@ variable "node_maximum_unavailable" {
     )
 
     error_message = "node_maximum_unavailable must be between 1 and 100."
+  }
+}
+
+variable "eks_admin_principal_arn" {
+  description = "Durable IAM role ARN granted administrator access to the development EKS cluster."
+  type        = string
+
+  validation {
+    condition = can(
+      regex(
+        "^arn:[^:]+:iam::[0-9]{12}:role/.+$",
+        var.eks_admin_principal_arn
+      )
+    )
+
+    error_message = "eks_admin_principal_arn must be a valid IAM role ARN."
   }
 }
 

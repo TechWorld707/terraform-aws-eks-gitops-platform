@@ -43,3 +43,21 @@ output "kms_alias_name" {
   description = "Alias of the KMS key encrypting Kubernetes secrets."
   value       = aws_kms_alias.cluster.name
 }
+
+output "access_entry_principal_arns" {
+  description = "Map of access-entry key to IAM principal ARN."
+
+  value = {
+    for key, entry in aws_eks_access_entry.this :
+    key => entry.principal_arn
+  }
+}
+
+output "access_policy_arns" {
+  description = "Map of access-entry key to associated EKS access policy ARN."
+
+  value = {
+    for key, association in aws_eks_access_policy_association.this :
+    key => association.policy_arn
+  }
+}
