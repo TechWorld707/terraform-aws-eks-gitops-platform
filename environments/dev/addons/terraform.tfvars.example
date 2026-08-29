@@ -14,3 +14,15 @@ load_balancer_controller_replicas      = 2
 tags = {
   Owner = "platform-engineering"
 }
+
+external_dns_hosted_zone_ids = [
+  "Z1234567890EXAMPLE"
+]
+
+external_dns_domain_filters = [
+  "dev.example.com"
+]
+
+external_dns_chart_version = "1.21.1"
+external_dns_policy        = "upsert-only"
+external_dns_txt_owner_id  = "three-tier-eks-dev"

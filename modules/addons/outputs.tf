@@ -86,3 +86,23 @@ output "load_balancer_controller_association_id" {
   description = "ID of the AWS Load Balancer Controller Pod Identity association."
   value       = aws_eks_pod_identity_association.load_balancer_controller.id
 }
+
+output "external_dns_role_name" {
+  description = "Name of the ExternalDNS Pod Identity IAM role."
+  value       = aws_iam_role.external_dns.name
+}
+
+output "external_dns_role_arn" {
+  description = "ARN of the ExternalDNS Pod Identity IAM role."
+  value       = aws_iam_role.external_dns.arn
+}
+
+output "external_dns_policy_arn" {
+  description = "ARN of the Route 53 policy assigned to ExternalDNS."
+  value       = aws_iam_policy.external_dns.arn
+}
+
+output "external_dns_association_id" {
+  description = "ID of the ExternalDNS EKS Pod Identity association."
+  value       = aws_eks_pod_identity_association.external_dns.association_id
+}

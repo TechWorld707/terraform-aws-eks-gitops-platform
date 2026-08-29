@@ -115,3 +115,20 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "external_dns_hosted_zone_ids" {
+  description = "Route 53 hosted-zone IDs ExternalDNS may modify."
+  type        = set(string)
+
+  validation {
+    condition = (
+      length(var.external_dns_hosted_zone_ids) > 0 &&
+      alltrue([
+        for zone_id in var.external_dns_hosted_zone_ids :
+        can(regex("^Z[A-Z0-9]+$", zone_id))
+      ])
+    )
+
+    error_message = "external_dns_hosted_zone_ids must contain at least one valid Route 53 hosted-zone ID."
+  }
+}

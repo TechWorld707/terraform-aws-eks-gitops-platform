@@ -90,3 +90,83 @@ variable "load_balancer_controller_replicas" {
     error_message = "At least two controller replicas are required for availability."
   }
 }
+
+variable "external_dns_hosted_zone_ids" {
+  description = "Route 53 hosted-zone IDs ExternalDNS may modify."
+  type        = set(string)
+
+  validation {
+    condition = (
+      length(var.external_dns_hosted_zone_ids) > 0 &&
+      alltrue([
+        for zone_id in var.external_dns_hosted_zone_ids :
+        can(regex("^Z[A-Z0-9]+$", zone_id))
+      ])
+    )
+
+    error_message = "external_dns_hosted_zone_ids must contain at least one valid Route 53 hosted-zone ID."
+  }
+}
+
+variable "external_dns_domain_filters" {
+  description = "DNS domains ExternalDNS is permitted to manage."
+  type        = set(string)
+
+  validation {
+    condition = (
+      length(var.external_dns_domain_filters) > 0 &&
+      alltrue([
+        for domain in var.external_dns_domain_filters :
+        can(regex(
+          "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$",
+          domain
+        ))
+      ])
+    )
+
+    error_message = "external_dns_domain_filters must contain at least one valid DNS domain."
+  }
+}
+
+variable "external_dns_chart_version" {
+  description = "Pinned official ExternalDNS Helm chart version."
+  type        = string
+  default     = "1.21.1"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.external_dns_chart_version
+      )
+    )
+
+    error_message = "external_dns_chart_version must use semantic version format."
+  }
+}
+
+variable "external_dns_policy" {
+  description = "ExternalDNS record-management policy."
+  type        = string
+  default     = "upsert-only"
+
+  validation {
+    condition = contains(
+      ["create-only", "upsert-only", "sync"],
+      var.external_dns_policy
+    )
+
+    error_message = "external_dns_policy must be create-only, upsert-only or sync."
+  }
+}
+
+variable "external_dns_txt_owner_id" {
+  description = "Unique owner ID stored in ExternalDNS TXT ownership records."
+  type        = string
+  default     = "three-tier-eks-dev"
+
+  validation {
+    condition     = length(var.external_dns_txt_owner_id) > 0
+    error_message = "external_dns_txt_owner_id must not be empty."
+  }
+}

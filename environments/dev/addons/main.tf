@@ -20,5 +20,7 @@ module "addons" {
 
   addon_versions = var.addon_versions
 
+  external_dns_hosted_zone_ids = var.external_dns_hosted_zone_ids
+
   tags = var.tags
 }

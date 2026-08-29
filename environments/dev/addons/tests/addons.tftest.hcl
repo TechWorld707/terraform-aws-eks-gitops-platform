@@ -30,9 +30,13 @@ run "development_addons" {
     foundation_state_bucket = "terraform-state-test"
     foundation_state_key    = "eks-gitops/dev/foundation/terraform.tfstate"
 
-    foundation_state_kms_key_arn = (
-      "arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"
-    )
+    external_dns_hosted_zone_ids = [
+      "Z0123456789ABCDEF"
+    ]
+
+    external_dns_domain_filters = [
+      "dev.example.com"
+    ]
   }
 
   override_data {
