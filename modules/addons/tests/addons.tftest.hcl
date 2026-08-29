@@ -48,8 +48,8 @@ run "core_eks_addons" {
   }
 
   assert {
-    condition     = length(aws_eks_addon.managed) == 4
-    error_message = "The module must install four core managed add-ons."
+    condition     = length(aws_eks_addon.managed) == 5
+    error_message = "The module must install five managed add-ons."
   }
 
   assert {
