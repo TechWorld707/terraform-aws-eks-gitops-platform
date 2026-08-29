@@ -132,3 +132,41 @@ variable "external_dns_hosted_zone_ids" {
     error_message = "external_dns_hosted_zone_ids must contain at least one valid Route 53 hosted-zone ID."
   }
 }
+
+variable "external_secrets_secret_arns" {
+  description = "Secrets Manager secret ARNs External Secrets Operator may read."
+  type        = set(string)
+
+  validation {
+    condition = (
+      length(var.external_secrets_secret_arns) > 0 &&
+      alltrue([
+        for secret_arn in var.external_secrets_secret_arns :
+        can(regex(
+          "^arn:[^:]+:secretsmanager:[^:]+:[0-9]{12}:secret:.+$",
+          secret_arn
+        ))
+      ])
+    )
+
+    error_message = "external_secrets_secret_arns must contain at least one valid Secrets Manager secret ARN."
+  }
+}
+
+variable "external_secrets_kms_key_arns" {
+  description = "Customer-managed KMS key ARNs External Secrets Operator may use to decrypt secrets."
+  type        = set(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for key_arn in var.external_secrets_kms_key_arns :
+      can(regex(
+        "^arn:[^:]+:kms:[^:]+:[0-9]{12}:key/.+$",
+        key_arn
+      ))
+    ])
+
+    error_message = "external_secrets_kms_key_arns must contain valid KMS key ARNs."
+  }
+}

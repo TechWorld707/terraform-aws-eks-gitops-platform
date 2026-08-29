@@ -170,3 +170,69 @@ variable "external_dns_txt_owner_id" {
     error_message = "external_dns_txt_owner_id must not be empty."
   }
 }
+
+variable "external_secrets_secret_arns" {
+  description = "Secrets Manager secret ARNs External Secrets Operator may read."
+  type        = set(string)
+
+  validation {
+    condition = (
+      length(var.external_secrets_secret_arns) > 0 &&
+      alltrue([
+        for secret_arn in var.external_secrets_secret_arns :
+        can(regex(
+          "^arn:[^:]+:secretsmanager:[^:]+:[0-9]{12}:secret:.+$",
+          secret_arn
+        ))
+      ])
+    )
+
+    error_message = "external_secrets_secret_arns must contain at least one valid Secrets Manager secret ARN."
+  }
+}
+
+variable "external_secrets_kms_key_arns" {
+  description = "Customer-managed KMS key ARNs used to encrypt approved secrets."
+  type        = set(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for key_arn in var.external_secrets_kms_key_arns :
+      can(regex(
+        "^arn:[^:]+:kms:[^:]+:[0-9]{12}:key/.+$",
+        key_arn
+      ))
+    ])
+
+    error_message = "external_secrets_kms_key_arns must contain valid KMS key ARNs."
+  }
+}
+
+variable "external_secrets_chart_version" {
+  description = "Pinned official External Secrets Operator Helm chart version."
+  type        = string
+  default     = "2.9.0"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.external_secrets_chart_version
+      )
+    )
+
+    error_message = "external_secrets_chart_version must use semantic version format."
+  }
+}
+
+variable "external_secrets_replicas" {
+  description = "Number of External Secrets Operator replicas."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.external_secrets_replicas >= 2
+    error_message = "At least two External Secrets Operator replicas are required for availability."
+  }
+}

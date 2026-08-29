@@ -72,3 +72,28 @@ output "external_dns_chart_version" {
   description = "Deployed ExternalDNS Helm chart version."
   value       = helm_release.external_dns.version
 }
+
+output "external_secrets_role_name" {
+  description = "Name of the External Secrets Pod Identity IAM role."
+  value       = module.addons.external_secrets_role_name
+}
+
+output "external_secrets_role_arn" {
+  description = "ARN of the External Secrets Pod Identity IAM role."
+  value       = module.addons.external_secrets_role_arn
+}
+
+output "external_secrets_policy_arn" {
+  description = "ARN of the External Secrets IAM policy."
+  value       = module.addons.external_secrets_policy_arn
+}
+
+output "external_secrets_association_id" {
+  description = "ID of the External Secrets EKS Pod Identity association."
+  value       = module.addons.external_secrets_association_id
+}
+
+output "external_secrets_chart_version" {
+  description = "Deployed External Secrets Operator Helm chart version."
+  value       = helm_release.external_secrets.version
+}

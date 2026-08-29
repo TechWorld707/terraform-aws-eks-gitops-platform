@@ -26,3 +26,14 @@ external_dns_domain_filters = [
 external_dns_chart_version = "1.21.1"
 external_dns_policy        = "upsert-only"
 external_dns_txt_owner_id  = "three-tier-eks-dev"
+
+external_secrets_secret_arns = [
+  "arn:aws:secretsmanager:us-east-1:123456789012:secret:three-tier-eks/dev/*"
+]
+
+external_secrets_kms_key_arns = [
+  "arn:aws:kms:us-east-1:123456789012:key/REPLACE_WITH_KMS_KEY_ID"
+]
+
+external_secrets_chart_version = "2.9.0"
+external_secrets_replicas      = 2
