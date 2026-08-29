@@ -1,0 +1,13 @@
+aws_region   = "us-east-1"
+project_name = "three-tier-eks"
+environment  = "dev"
+
+foundation_state_bucket = "REPLACE_WITH_TERRAFORM_STATE_BUCKET"
+foundation_state_key    = "eks-gitops/dev/foundation/terraform.tfstate"
+
+# Leave empty to let EKS select compatible default add-on versions.
+addon_versions = {}
+
+tags = {
+  Owner = "platform-engineering"
+}
