@@ -41,3 +41,8 @@ external_secrets_replicas      = 2
 cluster_autoscaler_chart_version = "9.59.0"
 cluster_autoscaler_image_tag     = "v1.33.6"
 cluster_autoscaler_replicas      = 2
+
+argocd_chart_version            = "10.4.1"
+argocd_server_replicas          = 2
+argocd_repo_server_replicas     = 2
+argocd_application_set_replicas = 2

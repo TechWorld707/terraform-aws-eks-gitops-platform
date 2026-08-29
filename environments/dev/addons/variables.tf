@@ -281,3 +281,53 @@ variable "cluster_autoscaler_replicas" {
     error_message = "At least two Cluster Autoscaler replicas are required for availability."
   }
 }
+
+variable "argocd_chart_version" {
+  description = "Pinned official Argo CD Helm chart version."
+  type        = string
+  default     = "10.4.1"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.argocd_chart_version
+      )
+    )
+
+    error_message = "argocd_chart_version must use semantic version format."
+  }
+}
+
+variable "argocd_server_replicas" {
+  description = "Number of Argo CD API server replicas."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.argocd_server_replicas >= 2
+    error_message = "At least two Argo CD server replicas are required."
+  }
+}
+
+variable "argocd_repo_server_replicas" {
+  description = "Number of Argo CD repository server replicas."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.argocd_repo_server_replicas >= 2
+    error_message = "At least two Argo CD repository server replicas are required."
+  }
+}
+
+variable "argocd_application_set_replicas" {
+  description = "Number of Argo CD ApplicationSet controller replicas."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.argocd_application_set_replicas >= 2
+    error_message = "At least two ApplicationSet controller replicas are required."
+  }
+}
