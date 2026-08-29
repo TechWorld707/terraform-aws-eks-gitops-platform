@@ -22,6 +22,9 @@ run "core_eks_addons" {
     name         = "three-tier-eks"
     environment  = "dev"
     cluster_name = "three-tier-eks-dev"
+    external_dns_hosted_zone_ids = [
+      "Z0123456789ABCDEF"
+    ]
 
     tags = {
       Owner = "platform-engineering"
@@ -217,5 +220,32 @@ run "core_eks_addons" {
     )
 
     error_message = "The vendored AWS Load Balancer Controller policy must contain permission statements."
+  }
+
+  assert {
+    condition = (
+      aws_iam_role.external_dns.name ==
+      "three-tier-eks-dev-external-dns"
+    )
+
+    error_message = "The ExternalDNS Pod Identity role name is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.external_dns.namespace ==
+      "external-dns"
+    )
+
+    error_message = "ExternalDNS must use the external-dns namespace."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.external_dns.service_account ==
+      "external-dns"
+    )
+
+    error_message = "The ExternalDNS Pod Identity service account is incorrect."
   }
 }

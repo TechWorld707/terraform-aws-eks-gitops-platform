@@ -47,3 +47,28 @@ output "load_balancer_controller_chart_version" {
   description = "Installed AWS Load Balancer Controller Helm chart version."
   value       = helm_release.aws_load_balancer_controller.version
 }
+
+output "external_dns_role_name" {
+  description = "Name of the ExternalDNS Pod Identity IAM role."
+  value       = module.addons.external_dns_role_name
+}
+
+output "external_dns_role_arn" {
+  description = "ARN of the ExternalDNS Pod Identity IAM role."
+  value       = module.addons.external_dns_role_arn
+}
+
+output "external_dns_policy_arn" {
+  description = "ARN of the Route 53 policy assigned to ExternalDNS."
+  value       = module.addons.external_dns_policy_arn
+}
+
+output "external_dns_association_id" {
+  description = "ID of the ExternalDNS EKS Pod Identity association."
+  value       = module.addons.external_dns_association_id
+}
+
+output "external_dns_chart_version" {
+  description = "Deployed ExternalDNS Helm chart version."
+  value       = helm_release.external_dns.version
+}
