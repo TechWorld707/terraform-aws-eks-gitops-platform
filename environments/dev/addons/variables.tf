@@ -236,3 +236,48 @@ variable "external_secrets_replicas" {
     error_message = "At least two External Secrets Operator replicas are required for availability."
   }
 }
+
+variable "cluster_autoscaler_chart_version" {
+  description = "Pinned official Cluster Autoscaler Helm chart version."
+  type        = string
+  default     = "9.59.0"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.cluster_autoscaler_chart_version
+      )
+    )
+
+    error_message = "cluster_autoscaler_chart_version must use semantic version format."
+  }
+}
+
+variable "cluster_autoscaler_image_tag" {
+  description = "Cluster Autoscaler image tag matching the EKS Kubernetes minor version."
+  type        = string
+  default     = "v1.33.6"
+
+  validation {
+    condition = can(
+      regex(
+        "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.cluster_autoscaler_image_tag
+      )
+    )
+
+    error_message = "cluster_autoscaler_image_tag must use v-prefixed semantic version format."
+  }
+}
+
+variable "cluster_autoscaler_replicas" {
+  description = "Number of Cluster Autoscaler replicas using leader election."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.cluster_autoscaler_replicas >= 2
+    error_message = "At least two Cluster Autoscaler replicas are required for availability."
+  }
+}
