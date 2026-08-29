@@ -37,6 +37,14 @@ run "development_addons" {
     values = {
       outputs = {
         eks_cluster_name = "three-tier-eks-dev"
+
+        eks_cluster_endpoint = (
+          "https://example.eks.us-east-1.amazonaws.com"
+        )
+
+        eks_cluster_certificate_authority_data = (
+          "dGVzdC1jZXJ0aWZpY2F0ZS1hdXRob3JpdHk="
+        )
       }
     }
   }
