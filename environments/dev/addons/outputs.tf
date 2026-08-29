@@ -32,3 +32,18 @@ output "pod_identity_association_ids" {
   description = "Map of add-on key to EKS Pod Identity association ID."
   value       = module.addons.pod_identity_association_ids
 }
+
+output "load_balancer_controller_role_arn" {
+  description = "ARN of the AWS Load Balancer Controller Pod Identity role."
+  value       = module.addons.load_balancer_controller_role_arn
+}
+
+output "load_balancer_controller_policy_arn" {
+  description = "ARN of the AWS Load Balancer Controller IAM policy."
+  value       = module.addons.load_balancer_controller_policy_arn
+}
+
+output "load_balancer_controller_chart_version" {
+  description = "Installed AWS Load Balancer Controller Helm chart version."
+  value       = helm_release.aws_load_balancer_controller.version
+}

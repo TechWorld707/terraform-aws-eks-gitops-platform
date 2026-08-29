@@ -8,6 +8,9 @@ foundation_state_key    = "eks-gitops/dev/foundation/terraform.tfstate"
 # Leave empty to let EKS select compatible default add-on versions.
 addon_versions = {}
 
+load_balancer_controller_chart_version = "1.14.0"
+load_balancer_controller_replicas      = 2
+
 tags = {
   Owner = "platform-engineering"
 }
