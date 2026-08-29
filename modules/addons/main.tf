@@ -19,6 +19,11 @@ locals {
       version = try(var.addon_versions["coredns"], null)
     }
 
+    metrics_server = {
+      name    = "metrics-server"
+      version = try(var.addon_versions["metrics-server"], null)
+    }
+
     kube_proxy = {
       name    = "kube-proxy"
       version = try(var.addon_versions["kube-proxy"], null)

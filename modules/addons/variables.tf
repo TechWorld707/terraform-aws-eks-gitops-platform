@@ -52,6 +52,7 @@ variable "addon_versions" {
           "coredns",
           "eks-pod-identity-agent",
           "kube-proxy",
+          "metrics-server",
           "vpc-cni"
         ],
         addon_name

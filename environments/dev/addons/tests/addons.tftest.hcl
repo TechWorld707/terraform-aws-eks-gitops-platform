@@ -85,8 +85,8 @@ run "development_addons" {
   }
 
   assert {
-    condition     = length(module.addons.addon_names) == 5
-    error_message = "The development add-ons state must install five core add-ons."
+    condition     = length(module.addons.addon_names) == 6
+    error_message = "The development add-ons state must install six EKS add-ons."
   }
 
   assert {
