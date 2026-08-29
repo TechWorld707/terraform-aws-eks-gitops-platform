@@ -46,8 +46,8 @@ run "eks_cluster_and_node_roles" {
   }
 
   assert {
-    condition     = length(aws_iam_role_policy_attachment.node) == 2
-    error_message = "The node role must have two required managed policies."
+    condition     = length(aws_iam_role_policy_attachment.node) == 3
+    error_message = "The node role must have three required managed policies."
   }
 
   assert {
