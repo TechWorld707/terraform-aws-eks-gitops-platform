@@ -106,3 +106,23 @@ output "external_dns_association_id" {
   description = "ID of the ExternalDNS EKS Pod Identity association."
   value       = aws_eks_pod_identity_association.external_dns.association_id
 }
+
+output "external_secrets_role_name" {
+  description = "Name of the External Secrets Pod Identity IAM role."
+  value       = aws_iam_role.external_secrets.name
+}
+
+output "external_secrets_role_arn" {
+  description = "ARN of the External Secrets Pod Identity IAM role."
+  value       = aws_iam_role.external_secrets.arn
+}
+
+output "external_secrets_policy_arn" {
+  description = "ARN of the External Secrets IAM policy."
+  value       = aws_iam_policy.external_secrets.arn
+}
+
+output "external_secrets_association_id" {
+  description = "ID of the External Secrets EKS Pod Identity association."
+  value       = aws_eks_pod_identity_association.external_secrets.association_id
+}

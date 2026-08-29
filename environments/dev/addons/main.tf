@@ -22,5 +22,8 @@ module "addons" {
 
   external_dns_hosted_zone_ids = var.external_dns_hosted_zone_ids
 
+  external_secrets_secret_arns  = var.external_secrets_secret_arns
+  external_secrets_kms_key_arns = var.external_secrets_kms_key_arns
+
   tags = var.tags
 }

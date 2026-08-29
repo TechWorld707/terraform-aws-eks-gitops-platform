@@ -25,6 +25,13 @@ run "core_eks_addons" {
     external_dns_hosted_zone_ids = [
       "Z0123456789ABCDEF"
     ]
+    external_secrets_secret_arns = [
+      "arn:aws:secretsmanager:us-east-1:123456789012:secret:three-tier-eks/dev/database-AbCdEf"
+    ]
+
+    external_secrets_kms_key_arns = [
+      "arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+    ]
 
     tags = {
       Owner = "platform-engineering"
@@ -247,5 +254,49 @@ run "core_eks_addons" {
     )
 
     error_message = "The ExternalDNS Pod Identity service account is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_iam_role.external_secrets.name ==
+      "three-tier-eks-dev-external-secrets"
+    )
+
+    error_message = "The External Secrets Pod Identity role name is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.external_secrets.namespace ==
+      "external-secrets"
+    )
+
+    error_message = "External Secrets must use the external-secrets namespace."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.external_secrets.service_account ==
+      "external-secrets"
+    )
+
+    error_message = "The External Secrets Pod Identity service account is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_iam_role.external_secrets.permissions_boundary == null
+    )
+
+    error_message = "External Secrets must not use a permissions boundary by default."
+  }
+
+  assert {
+    condition = (
+      aws_iam_role.external_secrets.tags["Controller"] ==
+      "external-secrets"
+    )
+
+    error_message = "The External Secrets role must include its controller tag."
   }
 }

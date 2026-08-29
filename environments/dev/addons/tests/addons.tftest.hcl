@@ -37,6 +37,14 @@ run "development_addons" {
     external_dns_domain_filters = [
       "dev.example.com"
     ]
+
+    external_secrets_secret_arns = [
+      "arn:aws:secretsmanager:us-east-1:123456789012:secret:three-tier-eks/dev/database-AbCdEf"
+    ]
+
+    external_secrets_kms_key_arns = [
+      "arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+    ]
   }
 
   override_data {
@@ -188,5 +196,63 @@ run "development_addons" {
     )
 
     error_message = "The controller must run two replicas."
+  }
+
+  assert {
+    condition     = helm_release.external_secrets.name == "external-secrets"
+    error_message = "The External Secrets Helm release name is incorrect."
+  }
+
+  assert {
+    condition = (
+      helm_release.external_secrets.namespace ==
+      "external-secrets"
+    )
+
+    error_message = "External Secrets must use its dedicated namespace."
+  }
+
+  assert {
+    condition = (
+      helm_release.external_secrets.chart ==
+      "external-secrets"
+    )
+
+    error_message = "The official External Secrets chart must be installed."
+  }
+
+  assert {
+    condition = (
+      helm_release.external_secrets.version ==
+      var.external_secrets_chart_version
+    )
+
+    error_message = "The configured External Secrets chart version must be used."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.external_secrets.values)).installCRDs
+    )
+
+    error_message = "The External Secrets CRDs must be installed."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.external_secrets.values)).replicaCount ==
+      var.external_secrets_replicas
+    )
+
+    error_message = "External Secrets must use the configured replica count."
+  }
+
+  assert {
+    condition = (
+      yamldecode(one(helm_release.external_secrets.values)).serviceAccount.name ==
+      "external-secrets"
+    )
+
+    error_message = "External Secrets must use its dedicated service account."
   }
 }
