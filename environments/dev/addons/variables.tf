@@ -62,3 +62,31 @@ variable "tags" {
     Owner = "platform-engineering"
   }
 }
+
+variable "load_balancer_controller_chart_version" {
+  description = "Pinned Helm chart version for the AWS Load Balancer Controller."
+  type        = string
+  default     = "1.14.0"
+
+  validation {
+    condition = can(
+      regex(
+        "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        var.load_balancer_controller_chart_version
+      )
+    )
+
+    error_message = "load_balancer_controller_chart_version must use semantic version format."
+  }
+}
+
+variable "load_balancer_controller_replicas" {
+  description = "Number of AWS Load Balancer Controller replicas."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.load_balancer_controller_replicas >= 2
+    error_message = "At least two controller replicas are required for availability."
+  }
+}

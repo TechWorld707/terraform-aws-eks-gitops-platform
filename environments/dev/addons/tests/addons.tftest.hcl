@@ -1,3 +1,7 @@
+mock_provider "kubernetes" {}
+
+mock_provider "helm" {}
+
 mock_provider "aws" {
   override_during = plan
 
@@ -36,6 +40,7 @@ run "development_addons" {
 
     values = {
       outputs = {
+        vpc_id           = "vpc-0123456789abcdef0"
         eks_cluster_name = "three-tier-eks-dev"
 
         eks_cluster_endpoint = (
@@ -99,5 +104,85 @@ run "development_addons" {
     )
 
     error_message = "The development EBS CSI Pod Identity role name is incorrect."
+  }
+
+  assert {
+    condition = (
+      helm_release.aws_load_balancer_controller.name ==
+      "aws-load-balancer-controller"
+    )
+
+    error_message = "The AWS Load Balancer Controller release name is incorrect."
+  }
+
+  assert {
+    condition = (
+      helm_release.aws_load_balancer_controller.namespace ==
+      "kube-system"
+    )
+
+    error_message = "The AWS Load Balancer Controller must run in kube-system."
+  }
+
+  assert {
+    condition = (
+      helm_release.aws_load_balancer_controller.chart ==
+      "aws-load-balancer-controller"
+    )
+
+    error_message = "The expected AWS Load Balancer Controller chart must be installed."
+  }
+
+  assert {
+    condition = (
+      helm_release.aws_load_balancer_controller.version ==
+      "1.14.0"
+    )
+
+    error_message = "The AWS Load Balancer Controller chart version is incorrect."
+  }
+
+  assert {
+    condition = (
+      yamldecode(
+        one(helm_release.aws_load_balancer_controller.values)
+      ).clusterName ==
+      "three-tier-eks-dev"
+    )
+
+    error_message = "The controller must target the development EKS cluster."
+  }
+
+  assert {
+    condition = (
+      yamldecode(
+        one(helm_release.aws_load_balancer_controller.values)
+      ).vpcId ==
+      "vpc-0123456789abcdef0"
+    )
+
+    error_message = "The controller must use the development VPC."
+  }
+
+  assert {
+    condition = (
+      yamldecode(
+        one(helm_release.aws_load_balancer_controller.values)
+      ).serviceAccount.name ==
+      "aws-load-balancer-controller"
+    )
+
+    error_message = "The controller service-account name is incorrect."
+  }
+
+  assert {
+    condition = (
+      yamldecode(
+        one(helm_release.aws_load_balancer_controller.values)
+      ).replicaCount ==
+      2
+    )
+
+    error_message = "The controller must run two replicas."
   }
 }

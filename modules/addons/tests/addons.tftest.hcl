@@ -162,4 +162,60 @@ run "core_eks_addons" {
 
     error_message = "Required tags must be applied to the add-ons."
   }
+
+  assert {
+    condition = (
+      aws_iam_role.load_balancer_controller.name ==
+      "three-tier-eks-dev-load-balancer-controller"
+    )
+
+    error_message = "The AWS Load Balancer Controller Pod Identity role name is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_iam_policy.load_balancer_controller.name ==
+      "three-tier-eks-dev-load-balancer-controller"
+    )
+
+    error_message = "The AWS Load Balancer Controller IAM policy name is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_eks_pod_identity_association.load_balancer_controller.namespace ==
+      "kube-system" &&
+      aws_eks_pod_identity_association.load_balancer_controller.service_account ==
+      "aws-load-balancer-controller"
+    )
+
+    error_message = "The AWS Load Balancer Controller Pod Identity association is incorrect."
+  }
+
+  assert {
+    condition = (
+      jsondecode(
+        file(
+          "${path.module}/policies/aws-load-balancer-controller-v2.14.1.json"
+        )
+      ).Version ==
+      "2012-10-17"
+    )
+
+    error_message = "The vendored AWS Load Balancer Controller policy must use the expected IAM policy version."
+  }
+
+  assert {
+    condition = (
+      length(
+        jsondecode(
+          file(
+            "${path.module}/policies/aws-load-balancer-controller-v2.14.1.json"
+          )
+        ).Statement
+      ) > 0
+    )
+
+    error_message = "The vendored AWS Load Balancer Controller policy must contain permission statements."
+  }
 }
