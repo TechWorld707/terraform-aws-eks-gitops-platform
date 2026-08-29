@@ -257,7 +257,7 @@ variable "cluster_autoscaler_chart_version" {
 variable "cluster_autoscaler_image_tag" {
   description = "Cluster Autoscaler image tag matching the EKS Kubernetes minor version."
   type        = string
-  default     = "v1.33.6"
+  default     = "v1.36.1"
 
   validation {
     condition = can(

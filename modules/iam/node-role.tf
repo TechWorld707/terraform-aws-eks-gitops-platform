@@ -28,6 +28,7 @@ locals {
   node_managed_policy_arns = {
     worker_node = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
     ecr_pull    = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
+    vpc_cni     = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
   }
 }
 

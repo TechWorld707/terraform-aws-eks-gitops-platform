@@ -295,7 +295,7 @@ run "development_addons" {
   assert {
     condition = (
       yamldecode(one(helm_release.cluster_autoscaler.values)).image.tag ==
-      "v1.33.6"
+      "v1.36.1"
     )
 
     error_message = "Cluster Autoscaler must use the Kubernetes 1.33-compatible image."
