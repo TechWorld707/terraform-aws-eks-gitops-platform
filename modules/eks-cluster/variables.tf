@@ -177,3 +177,68 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "access_entries" {
+  description = "Map of IAM principals granted access to the EKS cluster."
+
+  type = map(object({
+    principal_arn     = string
+    type              = optional(string, "STANDARD")
+    user_name         = optional(string)
+    kubernetes_groups = optional(set(string), [])
+
+    policy_arn = string
+
+    access_scope = object({
+      type       = string
+      namespaces = optional(set(string), [])
+    })
+  }))
+
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for entry in values(var.access_entries) :
+      can(regex(
+        "^arn:[^:]+:iam::[0-9]{12}:(role|user)/.+$",
+        entry.principal_arn
+      ))
+    ])
+
+    error_message = "Every access entry principal must be a durable IAM role or user ARN."
+  }
+
+  validation {
+    condition = alltrue([
+      for entry in values(var.access_entries) :
+      can(regex(
+        "^arn:[^:]+:eks::aws:cluster-access-policy/.+$",
+        entry.policy_arn
+      ))
+    ])
+
+    error_message = "Every access entry policy_arn must be a valid EKS cluster access policy ARN."
+  }
+
+  validation {
+    condition = alltrue([
+      for entry in values(var.access_entries) :
+      contains(["cluster", "namespace"], entry.access_scope.type)
+    ])
+
+    error_message = "Every access scope type must be cluster or namespace."
+  }
+
+  validation {
+    condition = alltrue([
+      for entry in values(var.access_entries) :
+      (
+        entry.access_scope.type == "namespace" ||
+        length(entry.access_scope.namespaces) == 0
+      )
+    ])
+
+    error_message = "Namespace values may only be supplied for namespace-scoped access."
+  }
+}

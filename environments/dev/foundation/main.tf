@@ -68,6 +68,17 @@ module "eks_cluster" {
   tags = var.tags
 
   depends_on = [module.iam]
+
+  access_entries = {
+    platform_admin = {
+      principal_arn = var.eks_admin_principal_arn
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+      access_scope = {
+        type = "cluster"
+      }
+    }
+  }
 }
 
 module "managed_node_group" {

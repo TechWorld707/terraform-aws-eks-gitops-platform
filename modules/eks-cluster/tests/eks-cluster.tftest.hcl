@@ -15,7 +15,7 @@ run "secure_eks_control_plane" {
   variables {
     name               = "three-tier-eks"
     environment        = "dev"
-    kubernetes_version = "1.33"
+    kubernetes_version = "1.36"
 
     cluster_role_arn = "arn:aws:iam::123456789012:role/three-tier-eks-dev-cluster-role"
 
@@ -28,6 +28,17 @@ run "secure_eks_control_plane" {
     tags = {
       Owner = "platform-engineering"
     }
+
+    access_entries = {
+      platform_admin = {
+        principal_arn = "arn:aws:iam::123456789012:role/platform-administrator"
+        policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+        access_scope = {
+          type = "cluster"
+        }
+      }
+    }
   }
 
   assert {
@@ -36,24 +47,17 @@ run "secure_eks_control_plane" {
   }
 
   assert {
-    condition = (
-      aws_eks_cluster.this.role_arn ==
-      var.cluster_role_arn
-    )
-
+    condition     = aws_eks_cluster.this.role_arn == var.cluster_role_arn
     error_message = "The EKS cluster must use the supplied cluster IAM role."
   }
 
   assert {
-    condition     = aws_eks_cluster.this.version == "1.33"
+    condition     = aws_eks_cluster.this.version == "1.36"
     error_message = "The EKS cluster must use the configured Kubernetes version."
   }
 
   assert {
-    condition = (
-      length(aws_eks_cluster.this.vpc_config[0].subnet_ids) == 3
-    )
-
+    condition     = length(aws_eks_cluster.this.vpc_config[0].subnet_ids) == 3
     error_message = "The EKS cluster must use all three supplied private subnets."
   }
 
@@ -135,5 +139,37 @@ run "secure_eks_control_plane" {
   assert {
     condition     = aws_eks_cluster.this.tags["Owner"] == "platform-engineering"
     error_message = "Additional tags must be applied to the EKS cluster."
+  }
+
+  assert {
+    condition     = length(aws_eks_access_entry.this) == 1
+    error_message = "The module must create the configured EKS access entry."
+  }
+
+  assert {
+    condition = (
+      aws_eks_access_entry.this["platform_admin"].principal_arn ==
+      "arn:aws:iam::123456789012:role/platform-administrator"
+    )
+
+    error_message = "The platform administrator access principal is incorrect."
+  }
+
+  assert {
+    condition = (
+      aws_eks_access_policy_association.this["platform_admin"].policy_arn ==
+      "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    )
+
+    error_message = "The platform administrator must receive the EKS cluster administrator policy."
+  }
+
+  assert {
+    condition = (
+      aws_eks_access_policy_association.this["platform_admin"].access_scope[0].type ==
+      "cluster"
+    )
+
+    error_message = "The platform administrator policy must use cluster-wide scope."
   }
 }

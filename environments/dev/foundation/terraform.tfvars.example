@@ -44,8 +44,10 @@ eks_kubernetes_version = "1.36"
 eks_endpoint_public_access = false
 eks_public_access_cidrs     = []
 
+eks_admin_principal_arn = "arn:aws:iam::123456789012:role/platform-administrator"
+
 # Temporary until dedicated EKS access entries are implemented.
-eks_bootstrap_cluster_creator_admin_permissions = true
+eks_bootstrap_cluster_creator_admin_permissions = false
 
 # Keep false in development so the environment can be destroyed.
 eks_deletion_protection      = false

@@ -30,6 +30,10 @@ mock_provider "aws" {
 run "development_foundation" {
   command = plan
 
+  variables {
+    eks_admin_principal_arn = "arn:aws:iam::123456789012:role/platform-administrator"
+  }
+
   assert {
     condition = (
       module.iam.cluster_role_name ==
@@ -73,8 +77,8 @@ run "development_foundation" {
   }
 
   assert {
-    condition     = var.eks_bootstrap_cluster_creator_admin_permissions
-    error_message = "Temporary bootstrap administrator access must remain enabled until access entries are implemented."
+    condition     = !var.eks_bootstrap_cluster_creator_admin_permissions
+    error_message = "Bootstrap cluster-creator administrator access must remain disabled."
   }
 
   assert {
@@ -222,5 +226,23 @@ run "development_foundation" {
   assert {
     condition     = length(module.network.interface_endpoint_ids) == 0
     error_message = "Development must not plan chargeable interface endpoints."
+  }
+
+  assert {
+    condition = (
+      module.eks_cluster.access_entry_principal_arns["platform_admin"] ==
+      "arn:aws:iam::123456789012:role/platform-administrator"
+    )
+
+    error_message = "The expected platform administrator access entry must be configured."
+  }
+
+  assert {
+    condition = (
+      module.eks_cluster.access_policy_arns["platform_admin"] ==
+      "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    )
+
+    error_message = "The platform administrator must receive the EKS cluster administrator policy."
   }
 }
