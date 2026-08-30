@@ -28,7 +28,9 @@ provider "kubernetes" {
       "--cluster-name",
       data.terraform_remote_state.foundation.outputs.eks_cluster_name,
       "--region",
-      var.aws_region
+      var.aws_region,
+      "--role-arn",
+      data.terraform_remote_state.foundation.outputs.eks_access_entry_principal_arns["platform_admin"]
     ]
   }
 }
@@ -51,7 +53,9 @@ provider "helm" {
         "--cluster-name",
         data.terraform_remote_state.foundation.outputs.eks_cluster_name,
         "--region",
-        var.aws_region
+        var.aws_region,
+        "--role-arn",
+        data.terraform_remote_state.foundation.outputs.eks_access_entry_principal_arns["platform_admin"]
       ]
     }
   }
