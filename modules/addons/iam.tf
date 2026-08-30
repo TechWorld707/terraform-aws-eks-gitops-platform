@@ -27,7 +27,7 @@ locals {
     ebs_csi = {
       name = "${local.resource_name}-ebs-csi"
       policy_arn = (
-        "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicyV2"
+        "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
       )
     }
   }

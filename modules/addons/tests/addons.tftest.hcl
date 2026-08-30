@@ -118,7 +118,7 @@ run "core_eks_addons" {
   assert {
     condition = (
       aws_iam_role_policy_attachment.pod_identity["ebs_csi"].policy_arn ==
-      "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicyV2"
+      "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
     )
 
     error_message = "The EBS CSI role must use AmazonEBSCSIDriverPolicyV2."
