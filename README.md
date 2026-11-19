@@ -1,67 +1,87 @@
 # Amazon EKS GitOps Platform with Terraform
 
-Project 2 builds a production-oriented internal Kubernetes platform on Amazon EKS and deploys a three-tier application through GitOps.
+[![Terraform pull-request validation](https://github.com/TechWorld707/terraform-aws-eks-gitops-platform/actions/workflows/terraform-pr.yml/badge.svg)](https://github.com/TechWorld707/terraform-aws-eks-gitops-platform/actions/workflows/terraform-pr.yml)
 
-The project demonstrates infrastructure as code, Kubernetes platform engineering, container security, software supply-chain controls, AWS identity, observability, automated delivery and rollback.
+A production-oriented Amazon EKS platform provisioned with Terraform and designed for secure, automated application delivery through GitHub Actions and Argo CD.
 
-## Repository model
+This project demonstrates Kubernetes platform engineering, infrastructure as code, GitOps delivery, AWS identity management, container security, observability, software supply-chain controls, and automated rollback.
 
-The platform is separated into three repositories with different ownership responsibilities.
+## Platform overview
+
+The solution is separated into three repositories to establish clear ownership boundaries between infrastructure, application source code, and deployment configuration.
 
 | Repository | Responsibility |
-|---|---|
-| `terraform-aws-eks-gitops-platform` | Provisions AWS infrastructure, EKS and initial platform add-ons |
-| `three-tier-eks-application` | Stores frontend and backend source code, tests and container build definitions |
-| `three-tier-eks-gitops` | Stores the desired Kubernetes and Helm application configuration watched by Argo CD |
+| --- | --- |
+| [`terraform-aws-eks-gitops-platform`](https://github.com/TechWorld707/terraform-aws-eks-gitops-platform) | Provisions the AWS infrastructure, EKS cluster, ECR repositories, identity controls, and initial platform add-ons |
+| [`three-tier-eks-application`](https://github.com/TechWorld707/three-tier-eks-application) | Contains the frontend and API source code, tests, and container build definitions |
+| [`three-tier-eks-gitops`](https://github.com/TechWorld707/three-tier-eks-gitops) | Defines the desired Kubernetes and Helm configuration continuously reconciled by Argo CD |
 
-Repositories:
+## Delivery architecture
 
-- [Infrastructure repository](https://github.com/TechWorld707/terraform-aws-eks-gitops-platform)
-- [Application repository](https://github.com/TechWorld707/three-tier-eks-application)
-- [GitOps repository](https://github.com/TechWorld707/three-tier-eks-gitops)
+```mermaid
+flowchart TD
+    DEV["Developer"] --> APP["Application repository"]
+    APP --> CI["GitHub Actions"]
+    CI --> ECR["Amazon ECR"]
+    CI --> GITOPS["GitOps repository"]
+
+    TF["Terraform repository"] --> AWS["AWS infrastructure"]
+    AWS --> EKS["Amazon EKS"]
+
+    GITOPS --> ARGO["Argo CD"]
+    ARGO --> EKS
+    ECR --> EKS
+```
+
+The application pipeline builds and validates container images before publishing them to Amazon ECR. Deployment state is stored separately in the GitOps repository and continuously reconciled with the EKS cluster by Argo CD.
 
 ## Architecture ownership
+
+### Terraform-managed infrastructure
 
 Terraform provisions and manages:
 
 - VPC
-- public and private subnets
-- routing and NAT gateways
+- Public and private subnets
+- Routing and NAT gateways
 - VPC endpoints
-- EKS control plane
+- Amazon EKS control plane
 - EKS managed node groups
-- ECR repositories
-- KMS keys
+- Amazon ECR repositories
+- AWS KMS keys
 - IAM roles and policies
-- EKS Pod Identity or IRSA
 - AWS-managed EKS add-ons
-- initial platform bootstrap
+- Initial platform bootstrap
 
-The separate add-ons Terraform state initially installs:
+### Platform add-ons
+
+A separate Terraform state installs the initial platform services:
 
 - Argo CD
 - AWS Load Balancer Controller
 - ExternalDNS
 - External Secrets Operator
 - Metrics Server
-- required Kubernetes namespaces
-- selected autoscaling prerequisites
+- Required Kubernetes namespaces
+- Autoscaling prerequisites
 
-After Argo CD is operational, GitOps manages:
+### GitOps-managed resources
 
-- frontend workloads
+After Argo CD is operational, the GitOps repository manages:
+
+- Frontend workloads
 - API workloads
 - Kubernetes Services
 - Ingress resources
 - ConfigMaps
 - Horizontal Pod Autoscalers
 - NetworkPolicies
-- application image digests
-- application updates and rollbacks
+- Application image digests
+- Application updates and rollbacks
 
 ## State separation
 
-The development environment uses separate Terraform roots:
+The development environment uses two independent Terraform roots:
 
 ```text
 environments/dev/foundation
