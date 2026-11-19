@@ -46,3 +46,15 @@ argocd_chart_version            = "10.4.1"
 argocd_server_replicas          = 2
 argocd_repo_server_replicas     = 2
 argocd_application_set_replicas = 2
+
+# Optional. Create the Secret in monitoring with the alertmanager.yaml key,
+# then set this to its name to enable your Alertmanager notification routes.
+# observability_alertmanager_config_secret = "alertmanager-notifications"
+
+# Optional. Use the ARN suffixes of the ALB and the frontend target group
+# created by the GitOps ingress. Use an SNS topic with confirmed subscribers.
+# observability_alb = {
+#   load_balancer = "app/<name>/<id>"
+#   target_group  = "targetgroup/<name>/<id>"
+#   sns_topic_arn = "arn:aws:sns:us-east-1:123456789012:observability"
+# }

@@ -66,3 +66,21 @@ The development environment uses separate Terraform roots:
 ```text
 environments/dev/foundation
 environments/dev/addons
+## Development observability
+
+The `environments/dev/addons` stack installs Prometheus, Alertmanager, Grafana,
+Blackbox Exporter, Fluent Bit, an OpenTelemetry Collector, and single-binary Tempo.
+Apply the add-ons before syncing the GitOps monitoring resources so the Prometheus
+Operator CRDs exist. Prometheus and Tempo each request a 10 GiB encrypted gp3
+volume. Prometheus retains up to seven days or 8 GB and Tempo retains 48 hours.
+Fluent Bit ships logs from `three-tier-dev` to
+`/aws/eks/<cluster-name>/three-tier-dev` with 14-day retention. EKS already publishes
+control-plane logs to `/aws/eks/<cluster-name>/cluster`. Grafana and Fluent Bit use
+EKS Pod Identity for their respective CloudWatch access.
+
+After the application Ingress provisions an ALB, set `observability_alb` with its
+ALB and frontend target group ARN suffixes to create the unhealthy-target alarm.
+The optional SNS topic must allow CloudWatch to publish and have confirmed subscribers.
+For application notifications, create a Secret in `monitoring` with the
+`alertmanager.yaml` key and set `observability_alertmanager_config_secret` to its
+name. Until a receiver is configured, application alerts are visible in Alertmanager.
